@@ -1,18 +1,33 @@
-import {Preset, Rule } from 'unocss'
+import type { PresetUnoOptions, Theme } from "@unocss/preset-uno";
+import type { Preset, Rule } from "unocss";
+import Uno from "@unocss/preset-uno";
+import { colors } from "./colors";
+import { ScrollRotate, ScrollShow } from "./rules";
 
-const ScrollRotate: Rule = [
-  /^animate-scroll-rotate(.*)$/, 
-  () => [
-    [ 'animation', "scrollRotate" ],
-    [ "animation-timeline", "view()"]
-  ]
-];
+function preset() {
+  return (opt: PresetUnoOptions = {}): Preset<Theme> => {
+    const uno: Omit<Preset<Theme>, "name"> = Uno(opt);
+    const theme = uno.theme as Theme;
+    delete theme.colors;
+    const autoComplete = uno.autocomplete;
 
-export function preset(): Preset {
-  return {
-    name: 'unocss-preset-tapp',
-    rules: [
-      ScrollRotate
-    ]
-  }
+    return ({
+      name: "unocss-preset-tapp",
+      ...uno,
+      rules: [
+        ...(uno.rules ? uno.rules : []) as Rule[],
+        ScrollRotate,
+        ScrollShow,
+      ],
+      theme: {
+        ...theme,
+        colors,
+      },
+      autocomplete: {
+        ...autoComplete,
+      },
+    });
+  };
 }
+
+export default preset;
